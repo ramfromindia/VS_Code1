@@ -1,3 +1,33 @@
+<!--
+    ============================================================================
+    JavaScript Class Private Fields - Example 1
+    ============================================================================
+    
+    DESCRIPTION:
+    This example demonstrates the use of private fields in JavaScript ES2022+.
+    Private fields are declared using the hash (#) prefix and are only accessible
+    within the class they are defined in.
+    
+    KEY CONCEPTS:
+    - Private Fields: Fields prefixed with # are private to the class
+    - Getter/Setter Methods: Used to provide controlled access to private fields
+    - Data Encapsulation: Prevents direct manipulation of internal state
+    - Validation: The setter enforces that count cannot be negative
+    
+    EXAMPLE BEHAVIOR:
+    1. Creates a Counter class with a private #count field (initialized to 0)
+    2. Implements a getter to retrieve the current count value
+    3. Implements a setter that validates input (rejects negative values)
+    4. Demonstrates setting positive and negative values
+    5. Displays the results: 124 and 0 (negative value rejected)
+    
+    USE CASES:
+    - Data validation and encapsulation
+    - Preventing accidental modification of internal state
+    - Creating robust class interfaces
+    ============================================================================
+-->
+
 <!DOCTYPE html>
 <html>
     <head>
@@ -35,24 +65,57 @@
         <h1 id = "myId1"></h1>
         <h1 id = "myId2"></h1>
         <script>
-            class Counter{
+            /**
+             * Counter Class
+             * 
+             * Demonstrates JavaScript private fields (#count) with getter and setter methods.
+             * This ensures the counter value cannot be set to negative numbers, providing
+             * data validation and encapsulation.
+             */
+            class Counter {
+                // Private field - only accessible within this class
+                // The # prefix makes this field private
                 #count = 0;
-                constructor(){
+                
+                constructor() {
+                    // Initialize Counter instance
+                    // Private field #count is automatically initialized to 0
                 }
-                get count(){
+                
+                /**
+                 * Getter for count
+                 * Allows read access to the private #count field
+                 * @returns {number} The current count value
+                 */
+                get count() {
                     return this.#count;
                 }
-                set count(value){
+                
+                /**
+                 * Setter for count
+                 * Provides controlled write access with validation
+                 * Rejects negative values by resetting to 0
+                 * @param {number} value - The new count value to set
+                 */
+                set count(value) {
+                    // Validate input: only allow non-negative values
                     this.#count = value >= 0 ? value : 0;
                 }
             }
+            
+            // Create a new Counter instance
             const counter = new Counter();
+            
+            // Test 1: Set counter to a positive value
             counter.count = 124;
             const myCounterVariable1 = document.getElementById("myId1");
-            myCounterVariable1.textContent = counter.count;
+            myCounterVariable1.textContent = counter.count; // Displays: 124
+            
+            // Test 2: Attempt to set counter to a negative value
+            // The setter will reject this and reset to 0
             counter.count = -77;
             const myCounterVariable2 = document.getElementById("myId2");
-            myCounterVariable2.textContent = counter.count;
+            myCounterVariable2.textContent = counter.count; // Displays: 0 (validation applied)
         </script>
     </body>
 </html>
