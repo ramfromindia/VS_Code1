@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <style>
+            body {
+                margin: 0;
+                padding: 0;
+                min-height: 100vh;
+                font-family: 'Segoe UI', Arial, sans-serif;
+                background: linear-gradient(135deg, #e0eafc 0%, #cfdef3 100%);
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+            }
+
+            h1 {
+                color: #333;
+                background: #fff;
+                padding: 24px 48px;
+                margin: 20px 0;
+                border-radius: 16px;
+                box-shadow: 0 8px 24px rgba(0,0,0,0.12), 0 1.5px 4px rgba(0,0,0,0.10);
+                font-size: 2.2rem;
+                letter-spacing: 1px;
+                transition: box-shadow 0.3s;
+            }
+
+            h1:hover {
+                box-shadow: 0 12px 32px rgba(0,0,0,0.18), 0 2px 8px rgba(0,0,0,0.12);
+            }
+        </style>
+    </head>
+    <body>
+        <h1 id = "fahrenheit"></h1>
+        <h1 id = "celsius"></h1>
+        <script>
+            class Temperature {
+                #celsius;
+                get celsius() {
+                    return this.#celsius;
+                    }
+
+                set celsius(value) {
+                    this.#celsius = value;
+                    }
+
+                get fahrenheit() {
+                    return (this.#celsius * 9) / 5 + 32;
+                    }
+
+                set fahrenheit(value) {
+                    this.#celsius = ((value - 32) * 5) / 9;
+                    }
+                    }
+
+            const temp = new Temperature();
+            temp.celsius = 25;
+            const myFahrenheitVar = document.getElementById("fahrenheit")
+            myFahrenheitVar.textContent = temp.fahrenheit; // 77
+            temp.fahrenheit = 68;
+            const myCelsiusVar = document.getElementById("celsius");
+            myCelsiusVar.textContent = temp.celsius; // 20
+        </script>
+    </body>
+</html>

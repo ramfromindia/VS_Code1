@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Expense Tracker</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: linear-gradient(120deg, #f8fafc 0%, #e0e7ff 100%);
+      margin: 0;
+      padding: 20px;
+      min-height: 100vh;
+    }
+    h1, h2, h3 {
+      text-align: center;
+      color: #3b3b5c;
+    }
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    .input-group {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+    }
+    input, select, button {
+      padding: 10px;
+      border: 1px solid #c7d2fe;
+      border-radius: 6px;
+      font-size: 1rem;
+    }
+    input:focus, select:focus {
+      border-color: #6366f1;
+      outline: none;
+    }
+    #addBtn {
+      background: #6366f1;
+      color: #fff;
+      border: none;
+      padding: 10px 20px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    #addBtn:hover {
+      background: #818cf8;
+    }
+    #expenseList {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 15px;
+      margin: 20px 0;
+    }
+    .expense-item {
+      background: #fff;
+      border-radius: 8px;
+      padding: 15px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      border-left: 4px solid #6366f1;
+    }
+    .expense-item button {
+      background: #ef4444;
+      color: #fff;
+      border: none;
+      padding: 5px 10px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .expense-item button:hover {
+      background: #dc2626;
+    }
+    .total {
+      background: #6366f1;
+      color: #fff;
+      padding: 12px;
+      border-radius: 6px;
+      width: 200px;
+      margin: 20px auto;
+      text-align: center;
+    }
+    .error {
+      color: #ef4444;
+      text-align: center;
+      margin: 10px 0;
+    }
+    @media (max-width: 600px) {
+      #expenseList {
+        grid-template-columns: 1fr;
+      }
+      .input-group {
+        flex-direction: column;
+        align-items: center;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Personal Expense Tracker</h1>
+    <div class="input-group">
+      <input type="text" id="desc" placeholder="Description" required />
+      <input type="number" id="amount" placeholder="Amount" min="0.01" step="0.01" max="1000000" required />
+      <input type="date" id="date" required />
+      <select id="category">
+        <option value="Food">Food</option>
+        <option value="Transport">Transport</option>
+        <option value="Utilities">Utilities</option>
+        <option value="Other">Other</option>
+      </select>
+      <button id="addBtn">Add Expense</button>
+    </div>
+    <div id="error" class="error"></div>
+    <h2>All Expenses</h2>
+    <div id="expenseList"></div>
+    <div class="total">Total: ₹<span id="total">0.00</span></div>
+  </div>
+
+  <script>
+    // Refinement: Debounce utility to batch storage updates
+    // Purpose: Prevents excessive localStorage writes during rapid add/delete operations, reducing overhead
+    function debounce(fn, delay) {
+      let timeout;
+      return (...args) => {
+        clearTimeout(timeout);
+        timeout = setTimeout(() => fn(...args), delay);
+      };
+    }
+
+    class Expense {
+      constructor(id, description, amount, date, category) {
+        this.id = id;
+        this.description = description;
+        this.amount = parseFloat(amount);
+        this.date = new Date(date);
+        this.category = category;
+      }
+    }
+
+    class ExpenseManager {
+      constructor() {
+        this.expenseMap = new Map();
+        this.total = 0; // Refinement: Cache total to avoid recalculation
+        // Purpose: Reduces O(n) overhead in getTotal, improving performance
+        this.saveToStorage = debounce(this.saveToStorage.bind(this), 300); // Refinement: Debounce storage saves
+        // Purpose: Batches rapid updates, reducing localStorage overhead
+        this.loadFromStorage();
+      }
+
+      addExpense(category, expense) {
+        // Refinement: Stricter validation for category and expense
+        // Purpose: Enhances robustness by rejecting invalid inputs
+        if (!category || typeof category !== 'string' || category.trim() === '') {
+          throw new Error('Category must be a non-empty string');
+        }
+        if (!expense || isNaN(expense.amount) || expense.amount <= 0 || expense.amount > 1000000) {
+          throw new Error('Amount must be between 0.01 and 1,000,000');
+        }
+        const normalizedCategory = category.toLowerCase();
+        if (!this.expenseMap.has(normalizedCategory)) {
+          this.expenseMap.set(normalizedCategory, []);
+        }
+        const expenses = this.expenseMap.get(normalizedCategory);
+        expenses.push(expense);
+        // Refinement: Sort on add to maintain order
+        // Purpose: Avoids O(n log n) sorting in getAllExpenses, ensuring consistent performance
+        expenses.sort((a, b) => b.date - a.date);
+        this.total += expense.amount; // Refinement: Update cached total
+        this.saveToStorage();
+      }
+
+      deleteExpense(category, expenseId) {
+        // Refinement: Validate inputs for delete
+        // Purpose: Enhances robustness by preventing invalid operations
+        if (!category || !expenseId) {
+          throw new Error('Invalid category or expense ID');
+        }
+        const normalizedCategory = category.toLowerCase();
+        if (this.expenseMap.has(normalizedCategory)) {
+          const expenses = this.expenseMap.get(normalizedCategory);
+          const index = expenses.findIndex(e => e.id === expenseId);
+          if (index !== -1) {
+            this.total -= expenses[index].amount; // Refinement: Update cached total
+            expenses.splice(index, 1);
+            if (expenses.length === 0) {
+              this.expenseMap.delete(normalizedCategory);
+            }
+            this.saveToStorage();
+            return true; // Indicate success for UI update
+          }
+        }
+        return false; // Indicate failure
+      }
+
+      getAllExpenses() {
+        const all = [];
+        for (const [category, expenses] of this.expenseMap.entries()) {
+          all.push(...expenses);
+        }
+        // Refinement: No sorting here, as expenses are pre-sorted
+        // Purpose: Eliminates O(n log n) overhead, improving performance
+        return all;
+      }
+
+      getTotal() {
+        // Refinement: Return cached total
+        // Purpose: O(1) access instead of O(n), reducing overhead
+        return this.total.toFixed(2);
+      }
+
+      saveToStorage() {
+        // Refinement: Error handling for localStorage
+        // Purpose: Enhances robustness by handling QuotaExceededError
+        try {
+          const data = Array.from(this.expenseMap.entries()).map(([category, expenses]) => ({
+            category,
+            expenses: expenses.map(e => ({
+              id: e.id,
+              description: e.description,
+              amount: e.amount,
+              date: e.date.toISOString(),
+              category: e.category
+            }))
+          }));
+          // Refinement: Limit storage to last 1000 expenses
+          // Purpose: Prevents localStorage overflow, improving robustness
+          if (data.reduce((sum, { expenses }) => sum + expenses.length, 0) > 1000) {
+            const allExpenses = this.getAllExpenses();
+            const toKeep = allExpenses.slice(0, 1000);
+            this.expenseMap.clear();
+            toKeep.forEach(expense => {
+              const normalizedCategory = expense.category.toLowerCase();
+              if (!this.expenseMap.has(normalizedCategory)) {
+                this.expenseMap.set(normalizedCategory, []);
+              }
+              this.expenseMap.get(normalizedCategory).push(expense);
+            });
+            this.saveToStorage(); // Recursive call after trimming
+            return;
+          }
+          localStorage.setItem('expenses', JSON.stringify(data));
+        } catch (error) {
+          console.error('Failed to save to localStorage:', error);
+          // Optionally notify user via UI
+          //errorDisplay.textContent = error.message;
+        //setTimeout(() => errorDisplay.textContent = '', 5000);
+        }
+      }
+
+      loadFromStorage() {
+        // Refinement: Recalculate total on load
+        // Purpose: Ensures cached total is accurate after deserialization
+        try {
+          const data = localStorage.getItem('expenses');
+          if (data) {
+            const parsed = JSON.parse(data);
+            this.expenseMap = new Map(
+              parsed.map(({ category, expenses }) => [
+                category,
+                expenses.map(e => new Expense(e.id, e.description, e.amount, e.date, e.category))
+              ])
+            );
+            this.total = this.getAllExpenses().reduce((sum, e) => sum + e.amount, 0);
+          }
+        } catch (error) {
+          console.error('Failed to load from localStorage:', error);
+          this.expenseMap.clear();
+          this.total = 0;
+        }
+      }
+    }
+
+    const manager = new ExpenseManager();
+    const descInput = document.getElementById('desc');
+    const amountInput = document.getElementById('amount');
+    const dateInput = document.getElementById('date');
+    const categoryInput = document.getElementById('category');
+    const addBtn = document.getElementById('addBtn');
+    const expenseList = document.getElementById('expenseList');
+    const totalDisplay = document.getElementById('total');
+    const errorDisplay = document.getElementById('error');
+
+    addBtn.addEventListener('click', () => {
+      try {
+        // Refinement: Stricter input validation
+        // Purpose: Enhances robustness by rejecting malicious or oversized inputs
+        const desc = descInput.value.trim();
+        if (desc.length === 0 || desc.length > 100) {
+          throw new Error('Description must be 1-100 characters');
+        }
+        if (!/^[a-zA-Z0-9\s.,-]+$/.test(desc)) {
+          throw new Error('Description contains invalid characters');
+        }
+        const amount = parseFloat(amountInput.value);
+        const date = dateInput.value;
+        const category = categoryInput.value;
+
+        if (!amount || !date || amount <= 0) {
+          throw new Error('Please fill all fields with valid values');
+        }
+
+        const expense = new Expense(Date.now(), desc, amount, date, category);
+        manager.addExpense(category, expense);
+        appendExpense(expense);
+        updateTotal();
+        clearForm();
+        errorDisplay.textContent = '';
+      } catch (error) {
+        errorDisplay.textContent = error.message;
+      }
+    });
+
+    // Refinement: Event delegation for delete buttons
+    // Purpose: Prevents memory leaks from multiple onclick handlers, reducing overhead
+    expenseList.addEventListener('click', (e) => {
+      if (e.target.classList.contains('delete-btn')) {
+        try {
+          const category = e.target.dataset.category;
+          const id = parseInt(e.target.dataset.id);
+          if (manager.deleteExpense(category, id)) {
+            // Refinement: Remove only the deleted item’s DOM node
+            // Purpose: Reduces overhead by avoiding full re-render
+            e.target.closest('.expense-item').remove();
+            updateTotal();
+          }
+        } catch (error) {
+          errorDisplay.textContent = error.message;
+        }
+      }
+    });
+
+    function appendExpense(expense) {
+      const div = document.createElement('div');
+      div.className = 'expense-item';
+      div.dataset.id = expense.id; // Refinement: Add data-id for delete
+      // Purpose: Enables targeted DOM removal, reducing overhead
+      div.innerHTML = `
+        <span>${expense.category} - ${expense.description} - ₹${expense.amount.toFixed(2)} - ${expense.date.toLocaleDateString()}</span>
+        <button class="delete-btn" data-category="${expense.category}" data-id="${expense.id}">Delete</button>
+      `;
+      expenseList.prepend(div); // Add new items at the top
+    }
+
+    function renderExpenses() {
+      expenseList.innerHTML = '';
+      const expenses = manager.getAllExpenses();
+      expenses.forEach(appendExpense);
+    }
+
+    function updateTotal() {
+      totalDisplay.textContent = manager.getTotal();
+    }
+
+    function clearForm() {
+      descInput.value = '';
+      amountInput.value = '';
+      dateInput.value = '';
+      categoryInput.value = 'Food';
+    }
+
+    // Initial render
+    renderExpenses();
+    updateTotal();
+  </script>
+</body>
+</html>

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <style>
+            body {
+            font-family: Arial, sans-serif;
+            background-color: #c17700;
+            color: #fff;
+            margin: 0;
+            padding: 20px;
+            text-align: center;
+            }
+            h1 {
+            margin: 10px 0;
+            font-size: 24px;
+            }
+            #myInput, #myOutput {
+            color: #007BFF;
+            font-weight: bold;
+            }
+        </style>
+
+        </style>
+    </head>
+    <body>
+        <h1>To remove falsy values from an array</h1>
+        <h1 id = "myInput"></h1>
+        <h1 id = "myOutput"></h1>
+        <script>
+            let arr = [23, 0, "gfg", false, true, NaN, 12, "hi", undefined, [], ""];
+            const input = document.getElementById("myInput");
+            const output = document.getElementById("myOutput");
+            input.innerHTML = "Input is: " + JSON.stringify(arr);
+            const filteredArray = arr.filter(Boolean);
+            output.innerHTML = "Output (truthy values): " + JSON.stringify(filteredArray);
+        </script>
+    </body>
+</html>

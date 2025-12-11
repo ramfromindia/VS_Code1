@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <style>
+        body{text-align:center;background-color:#c76300;color:#fff;}
+    </style>
+  </head>
+  <body>
+    <h1>Cash Register Project</h1>
+    <label for = "cash">Enter cash from customer:</label><br>
+    <input type="number" id="cash">
+    <p id="change-due"></p>
+    <button id="purchase-btn" onclick="myFunction()">Purchase</button>
+    <script>
+        let price = 1.87;
+let cid = [
+  ['PENNY', 1.01],
+  ['NICKEL', 2.05],
+  ['DIME', 3.1],
+  ['QUARTER', 4.25],
+  ['ONE', 90],
+  ['FIVE', 55],
+  ['TEN', 20],
+  ['TWENTY', 60],
+  ['ONE HUNDRED', 100]
+];
+
+function myFunction() {
+  // Get input value inside the function and convert to number
+  let cash = parseFloat(document.getElementById("cash").value);
+  let output = document.getElementById("change-due");
+  let change = cash - price;
+
+  // Validate input
+  if (isNaN(cash)) {
+    alert("Please enter a valid number");
+    return;
+  }
+
+  // Case 1: Insufficient funds
+  if (cash < price) {
+    alert("Customer does not have enough money to purchase the item");
+    output.innerHTML = "";
+    return;
+  }
+
+  // Case 2: Exact payment
+  if (cash === price) {
+    output.innerHTML = "No change due - customer paid with exact cash";
+    return;
+  }
+
+  // Case 3: Calculate change
+  if (change > 0) {
+    let changeDue = calculateChange(change);
+    if (changeDue.status === "INSUFFICIENT_FUNDS") {
+      output.innerHTML = "Status: INSUFFICIENT_FUNDS";
+    } else if (changeDue.status === "CLOSED") {
+      output.innerHTML = `Status: CLOSED ${formatChange(changeDue.change)}`;
+    } else {
+      output.innerHTML = `Status: OPEN ${formatChange(changeDue.change)}`;
+    }
+  }
+}
+
+// Helper function to calculate change
+function calculateChange(change) {
+  let changeArray = [];
+  let totalCid = cid.reduce((sum, [, amount]) => sum + amount, 0);
+  let denominations = [
+    ['ONE HUNDRED', 100],
+    ['TWENTY', 20],
+    ['TEN', 10],
+    ['FIVE', 5],
+    ['ONE', 1],
+    ['QUARTER', 0.25],
+    ['DIME', 0.1],
+    ['NICKEL', 0.05],
+    ['PENNY', 0.01]
+  ];
+
+  // Check if drawer has enough money
+  if (totalCid < change) {
+    return { status: "INSUFFICIENT_FUNDS", change: [] };
+  }
+
+  // Calculate change
+  let remainingChange = change;
+  for (let [denom, value] of denominations) {
+    let available = cid.find(row => row[0] === denom)[1];
+    let amountNeeded = 0;
+    while (remainingChange >= value && available > 0) {
+      remainingChange = parseFloat((remainingChange - value).toFixed(2));
+      available -= value;
+      amountNeeded += value;
+    }
+    if (amountNeeded > 0) {
+      changeArray.push([denom, amountNeeded]);
+    }
+  }
+
+  // If change can't be fully paid
+  if (remainingChange > 0) {
+    return { status: "INSUFFICIENT_FUNDS", change: [] };
+  }
+
+  // Check if drawer is empty after giving change
+  let remainingCid = cid.reduce((sum, [, amount]) => sum + amount, 0) - change;
+  if (remainingCid === 0) {
+    return { status: "CLOSED", change: changeArray };
+  }
+
+  return { status: "OPEN", change: changeArray };
+}
+
+// Helper function to format change output
+function formatChange(changeArray) {
+  return changeArray
+    .map(([denom, amount]) => `${denom}: $${amount.toFixed(2)}`)
+    .join(" ");
+}
+    </script>
+  </body>
+</html>

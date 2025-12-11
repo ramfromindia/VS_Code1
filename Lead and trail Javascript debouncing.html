@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debounce Example</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            background: linear-gradient(135deg, #74ebd5, #acb6e5);
+            font-family: Arial, sans-serif;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            padding: 30px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .container:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.3);
+        }
+
+        input[type="text"] {
+            width: 300px;
+            padding: 12px 20px;
+            border: 2px solid #ccc;
+            border-radius: 25px;
+            font-size: 16px;
+            outline: none;
+            transition: border-color 0.3s ease, transform 0.3s ease;
+            background: linear-gradient(145deg, #ffffff, #e6e6e6);
+            box-shadow: inset 2px 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        input[type="text"]:focus {
+            border-color: #74ebd5;
+            transform: scale(1.02);
+        }
+
+        #output {
+            padding: 15px 25px;
+            background: linear-gradient(145deg, #74ebd5, #acb6e5);
+            border-radius: 10px;
+            color: white;
+            font-size: 18px;
+            font-weight: bold;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            animation: fadeIn 0.5s ease-in-out;
+            transition: transform 0.3s ease;
+        }
+
+        #output:empty {
+            display: none;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 400px) {
+            .container {
+                width: 90%;
+                padding: 20px;
+            }
+            input[type="text"] {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <input type="text" id="inputField" placeholder="Type something...">
+        <div id="output"></div>
+        <div id="alsoOutput"></div>
+    </div>
+
+    <script>
+        // Debounce function with leading and trailing options
+        function debounce(func, wait, options = { leading: false, trailing: true }) {
+            let timeout = null;
+            let lastArgs = null;
+            let lastThis = null;
+
+            return function () {
+                const context = this;
+                const args = arguments;
+
+                // If leading is true and no timeout is active, execute immediately
+                if (options.leading && !timeout) {
+                    func.apply(context, args);
+                }
+
+                // Store args and context for trailing call
+                lastArgs = args;
+                lastThis = context;
+
+                // Clear any existing timeout
+                if (timeout) {
+                    clearTimeout(timeout);
+                }
+
+                // Set new timeout for trailing call
+                if (options.trailing) {
+                    timeout = setTimeout(() => {
+                        if (!options.leading || timeout) {
+                            func.apply(lastThis, lastArgs);
+                        }
+                        timeout = null;
+                        lastArgs = null;
+                        lastThis = null;
+                    }, wait);
+                }
+            };
+        }
+
+        const input = document.getElementById('inputField');
+        const output = document.getElementById('output');
+        const alsoOutput = document.getElementById("alsoOutput");
+
+        // Debounced function to handle input
+        const processInput = debounce((event) => {
+            output.textContent = `Processed input: ${event.target.value}`;
+            alsoOutput.textContent = `Debounced function called with: ${event.target.value}`;
+        }, 300, options = { leading: true, trailing: true });
+
+        // Attach event listener
+        input.addEventListener('input', processInput);
+    </script>
+</body>
+</html>

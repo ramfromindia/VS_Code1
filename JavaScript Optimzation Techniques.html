@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <style>
+            body {
+            min-height: 100vh;
+            margin: 0;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(135deg, #e0eafc 0%, #cfdef3 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            }
+            h1 {
+            color: #2d3a4b;
+            text-shadow: 1px 2px 8px #b0c4de;
+            margin-bottom: 24px;
+            letter-spacing: 1px;
+            }
+            textarea {
+            display: block;
+            width: 70vw;
+            max-width: 600px;
+            min-width: 300px;
+            padding: 16px;
+            font-size: 1.1rem;
+            border-radius: 12px;
+            border: 1.5px solid #b0c4de;
+            box-shadow: 0 4px 16px rgba(44, 62, 80, 0.08);
+            margin-bottom: 24px;
+            background: #fafdff;
+            transition: box-shadow 0.2s;
+            }
+            textarea:focus {
+            outline: none;
+            box-shadow: 0 6px 24px rgba(44, 62, 80, 0.15);
+            border-color: #7fa1c4;
+            }
+            #myOutput {
+            min-height: 40px;
+            font-size: 1.2rem;
+            color: #1a2636;
+            background: #ffffffcc;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(44, 62, 80, 0.07);
+            padding: 12px 20px;
+            margin-top: 8px;
+            display: flex;
+            align-items: center;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+            }
+            @media (max-width: 700px) {
+            textarea {
+                width: 95vw;
+                min-width: unset;
+            }
+            }
+        </style>
+    </head>
+    <body>
+        <h1>JavaScript debouncing mechanism applied</h1>
+        <textarea id="myInput" rows="10" cols = "70"></textarea>
+        <h1 id="myOutput"></h1>
+        <script>
+            const input = document.getElementById("myInput");
+            const output = document.getElementById("myOutput");
+
+            function handleSearch(query) {
+        output.innerHTML = `${query}`;
+    }
+
+            function debounceFunction(func, delay) {
+                let timeoutId;
+                return function () {
+                    let context = this;
+                    let args = arguments;
+                    clearTimeout(timeoutId);
+                    timeoutId = setTimeout(function () {
+                        func.apply(context, args);
+                    }, delay);
+                };
+            }
+
+            const debouncedSearch = debounceFunction(function () {
+                handleSearch(input.value);
+            }, 500);
+            input.addEventListener("input", debouncedSearch);
+            window.addEventListener("unload", () => {
+                input.removeEventListener("input", debouncedSearch);
+            });
+        </script>
+    </body>
+</html>

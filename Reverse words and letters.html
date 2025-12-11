@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                height: 100vh;
+                margin: 0;
+                background: #00f;
+                color: #fff;
+            }
+
+            h1 {
+                margin-bottom: 20px;
+                text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+            }
+
+            input[type="text"] {
+                padding: 10px;
+                background-color: #00f;
+                color: #fff;
+                text-align: center;
+                width: 300px;
+                border: 2px solid #ddd;
+                border-radius: 5px;
+                box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+                margin-bottom: 20px;
+                font-size: 16px;
+            }
+
+            input[type="text"]:focus {
+                outline: none;
+                border-color: #74ebd5;
+                box-shadow: 10px 15px 20px 10px rgba(116, 235, 213, 0.9);
+            }
+
+            #myOutput {
+                margin-top: 20px;
+                font-size: 20px;
+                font-weight: bold;
+                text-shadow: 10px 15px 18px yellowgreen;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>Input below a sentence to see it reversed</h1>
+        <input type="text" id="myInput">
+        <h1 id="myOutput"></h1>
+        <h1 id="myNextOutput"></h1>
+    </body>
+    <script>
+        const input = document.getElementById("myInput");
+        const output = document.getElementById("myOutput");
+        const nextOutput = document.getElementById("myNextOutput");
+
+        // Debounce function to limit rapid input processing
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+
+        // Process input efficiently
+        function processInput(input) {
+            return input
+                .trim()
+                .split(/\s+/)
+                .reverse()
+                .map(word => word.split("").reverse().join(""))
+                .join(" ");
+        }
+
+        // Update time display
+        function updateTime() {
+            nextOutput.textContent = new Date().toLocaleTimeString();
+        }
+
+        // Main input handler
+        const handleInput = debounce(() => {
+            const inputValue = input.value;
+            output.textContent = inputValue ? processInput(inputValue) : "";
+        }, 300);
+
+        // Event listener for input
+        input.addEventListener("input", handleInput);
+
+        // Manage single interval for time update
+        let timeInterval = null;
+        function startTimeUpdate() {
+            if (!timeInterval) {
+                updateTime();
+                timeInterval = setInterval(updateTime, 1000);
+            }
+        }
+
+        // Start time update when input is focused
+        input.addEventListener("focus", startTimeUpdate);
+
+        // Cleanup interval when page is unloaded
+        window.addEventListener("unload", () => {
+            if (timeInterval) {
+                clearInterval(timeInterval);
+            }
+        });
+    </script>
+</html>

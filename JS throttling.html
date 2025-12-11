@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Throttling Input with setTimeout and Arrow Functions</title>
+  <style>
+body {
+  background: linear-gradient(120deg, #f6d365 0%, #fda085 100%);
+  font-family: 'Segoe UI', Arial, sans-serif;
+  min-height: 100vh;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+textarea#inputArea {
+  width: 350px;
+  height: 100px;
+  padding: 14px;
+  border: none;
+  border-radius: 10px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+  font-size: 1.1rem;
+  resize: vertical;
+  margin-bottom: 24px;
+  background: #fffbe7;
+  transition: box-shadow 0.2s;
+}
+
+textarea#inputArea:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px #fda08555;
+}
+
+#output {
+  background: #fff;
+  padding: 18px 28px;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+  font-size: 1.15rem;
+  color: #333;
+  min-width: 350px;
+  text-align: left;
+  margin-top: 8px;
+  letter-spacing: 0.01em;
+}
+  </style>
+</head>
+<body>
+  <textarea id="inputArea" placeholder="Type here..."></textarea>
+  <div id="output">Output: (nothing typed yet)</div>
+  <script>
+    // Throttle function using setTimeout, capturing this and arguments
+    function throttle(func, delay) {
+      let timeoutId;
+      return function () {
+        // Check if no timeout is pending; if true, schedule a new one
+        if (!timeoutId) {
+          const context = this;
+          const args = arguments;
+          timeoutId = setTimeout(() => {
+            func.apply(context, args);
+            timeoutId = null;
+          }, delay);
+        }
+      };
+    }
+
+        //Function to update output based on textarea input
+    const updateOutput = (event) => {
+      const output = document.getElementById("output");
+      const text = event.target.value || "(nothing typed yet...)";
+      output.textContent = `Output: ${text}`;
+    };
+
+
+    //Throttled input event listener
+    const inputArea = document.getElementById("inputArea"); 
+    const throttledInput = throttle(updateOutput,500);
+    inputArea.addEventListener("input",throttledInput);
+  </script>
+</body>
+</html>

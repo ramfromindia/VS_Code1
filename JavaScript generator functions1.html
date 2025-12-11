@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fibonacci Generator Display</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    #output { margin-top: 20px; padding: 10px; border: 1px solid #ccc; }
+    button { margin: 5px; padding: 8px 16px; }
+  </style>
+</head>
+<body>
+  <h1>Fibonacci Numbers with Generator</h1>
+  <button onclick="displayFirstSix()">Show First 6 Fibonacci Numbers</button>
+  <button onclick="displayFirstTen()">Show First 10 Fibonacci Numbers</button>
+  <button onclick="displayGetFibonacci(5)">Show getFibonacciNumbers(5)</button>
+  <button onclick="displayGetFibonacciWithOptions(3, 'option1', 'option2')">Show getFibonacciNumbers(3, options)</button>
+  <div id="output">Results will appear here.</div>
+
+  <script>
+    function* fibonacci() {
+      let a = 0, b = 1;
+      while (true) {
+        yield a;
+        [a, b] = [b, a + b];
+      }
+    }
+
+    function getFibonacciNumbers(count, ...options) {
+      const fib = fibonacci();
+      const result = [];
+      let counter = 0;
+      for (let i of fib) {
+        if (counter >= count) break;
+        result.push(i);
+        counter++;
+      }
+      return options.length ? { numbers: result, options } : result;
+    }
+
+    function displayFirstSix() {
+      const fib = fibonacci();
+      let numbers = [];
+      let count = 0;
+      for (let n of fib) {
+        if(count > 5) break;
+        numbers.push(n);
+        count++;
+      }
+      document.getElementById('output').innerText = `First 6 Fibonacci Numbers: ${numbers.join(', ')}`;
+    }
+
+    function displayFirstTen() {
+      const fib10 = fibonacci();
+      let count = 0;
+      const numbers = [];
+      for (const num of fib10) {
+        if (count >= 10) break;
+        numbers.push(num);
+        count++;
+      }
+      document.getElementById('output').innerText = `First 10 Fibonacci Numbers: ${numbers.join(', ')}`;
+    }
+
+    function displayGetFibonacci(count) {
+      const result = getFibonacciNumbers(count);
+      document.getElementById('output').innerText = `getFibonacciNumbers(${count}): [${result.join(', ')}]`;
+    }
+
+    function displayGetFibonacciWithOptions(count, ...options) {
+      const result = getFibonacciNumbers(count, ...options);
+      document.getElementById('output').innerText = `getFibonacciNumbers(${count}, options): { numbers: [${result.numbers.join(', ')}], options: [${result.options.join(', ')}] }`;
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <style></style>
+    </head>
+    <body>
+        <h1 id = "myId1"></h1>
+        <h1 id = "myId2"></h1>
+        <script>
+            class Name{
+                #name;
+                constructor(myName){
+                    this.#name = myName;
+                }
+                get name(){
+                    return (this.#name + " ").toUpperCase().repeat(5);
+                }
+                set name(newName){
+                    this.#name = newName;
+                }
+            }
+            const person = new Name("Sugga");
+            const myNameVar1 = document.getElementById("myId1");
+            myNameVar1.textContent = person.name;
+            person.name = "Bara-Bari";
+            const myNameVar2 = document.getElementById("myId2");
+            myNameVar2.textContent = person.name;
+        </script>
+    </body>
+</html>

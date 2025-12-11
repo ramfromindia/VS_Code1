@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <style></style>
+    </head>
+    <body>
+        <h1 id = "myId1"></h1>
+        <h1 id = "myId2"></h1>
+        <h1 id = "myId3"></h1>
+        <script>
+            class Circle {
+            #radius;
+            constructor(radius) {
+            this.#radius = radius;
+                }
+
+            get radius() {
+              return this.#radius;
+                }
+
+            set radius(value) {
+                if (value <= 0) throw new Error("Radius must be positive!!");
+                this.#radius = value;
+                 }
+
+            get area() {
+                return Math.PI * this.#radius ** 2;
+                }
+            }
+            const myRadiusVar1 = document.getElementById("myId1");
+            const myRadiusVar2 = document.getElementById("myId2");
+            const myErrorObj1 = document.getElementById("myId3");
+
+            const circle = new Circle(5);
+            try{
+            myRadiusVar1.textContent = `Area1: ${circle.area} units sqr.`;
+            circle.radius = 10;
+            myRadiusVar2.textContent = `Area2: ${circle.area} units sqr.`;
+            circle.radius = -90;
+            }catch(error){
+                myErrorObj1.textContent = `Error: ${error.message}`;
+            }
+        </script>
+    </body>
+</html>

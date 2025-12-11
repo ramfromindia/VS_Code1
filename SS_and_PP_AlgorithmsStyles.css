@@ -1,0 +1,67 @@
+body {
+			font-family: Arial, sans-serif;
+			background: #f4f8fb;
+			margin: 0;
+			padding: 0;
+		}
+		main {
+			display: flex;
+			flex-wrap: wrap;
+			justify-content: center;
+			gap: 2rem;
+			margin: 2rem auto;
+			max-width: 900px;
+		}
+		section {
+			background: #fff;
+			border-radius: 10px;
+			box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+			padding: 2rem 1.5rem 1.5rem 1.5rem;
+			min-width: 340px;
+			flex: 1 1 340px;
+		}
+		h2 {
+			color: #1a4e8a;
+			margin-top: 0;
+		}
+		input[type="text"] {
+			width: 80%;
+			padding: 0.5rem;
+			font-size: 1rem;
+			border: 1px solid #bcd;
+			border-radius: 5px;
+			margin-bottom: 1rem;
+		}
+		button {
+			padding: 0.5rem 1.2rem;
+			font-size: 1rem;
+			background: #1a4e8a;
+			color: #fff;
+			border: none;
+			border-radius: 5px;
+			cursor: pointer;
+			margin-left: 0.5rem;
+			transition: background 0.2s;
+		}
+		button:hover {
+			background: #2566b3;
+		}
+		.result {
+			margin-top: 1rem;
+			font-size: 1.1rem;
+			color: #333;
+			min-height: 1.5em;
+			word-break: break-all;
+		}
+		#shunting-yard-calc {
+			border-top: 4px solid #1a4e8a;
+		}
+		#pratt-calc {
+			border-top: 4px solid #2a8a1a;
+		}
+		@media (max-width: 800px) {
+			main {
+				flex-direction: column;
+				align-items: center;
+			}
+		}

@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<body>
+<p>JavaScript Maps</p>
+<p>The Map.groupBy() Method</p>
+
+<h1 id="myId1"></h1>
+
+<script>
+// Create an Array
+const fruits = [
+  {name:"apples", quantity:300},
+  {name:"bananas", quantity:500},
+  {name:"oranges", quantity:200},
+  {name:"kiwi", quantity:150}
+];
+
+function myCallback({quantity}){
+    return quantity > 200 ? "ok" : "low";
+}
+
+// Group by ok and low
+// Polyfill for Map.groupBy if not available
+function groupBy(array, callback) {
+    const map = new Map();
+    for (const item of array) {
+        const key = callback(item);
+        if (!map.has(key)) {
+            map.set(key, []);
+        }
+        map.get(key).push(item);
+    }
+    return map;
+}
+
+const result = groupBy(fruits, myCallback);
+
+let text = "These fruits are Ok<br>";
+for(let x of result.get("ok") || []){
+    text += x.name + " " + x.quantity + "<br>";
+}
+
+text += "These fruits are low<br>";
+for(let x of result.get("low") || []){
+    text += x.name + " " + x.quantity + "<br>";
+}
+
+document.getElementById("myId1").innerHTML = text;
+</script>
+
+</body>
+</html>

@@ -1,0 +1,25 @@
+body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 20px;
+        }
+        #searchInput {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+        #myBtn {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        #bookList {
+            list-style-type: none;
+            padding: 0;
+        }
+        #bookList li {
+            padding: 8px;
+            border-bottom: 1px solid #ddd;
+        }

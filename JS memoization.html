@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Memoized Factorial Calculator</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 600px;
+      margin: 20px auto;
+      padding: 20px;
+      text-align: center;
+    }
+    input, button {
+      padding: 10px;
+      margin: 10px;
+      font-size: 16px;
+    }
+    #result {
+      margin-top: 20px;
+      font-size: 18px;
+      font-weight: bold;
+    }
+    #cacheLog {
+      margin-top: 20px;
+      font-size: 14px;
+      text-align: left;
+      background-color: #f0f0f0;
+      padding: 10px;
+      border-radius: 5px;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+  </style>
+</head>
+<body>
+  <h1>Memoized Factorial Calculator</h1>
+  <p>Enter a non-negative integer (e.g., 5) to compute its factorial.</p>
+  <input type="number" id="inputNumber" min="0" placeholder="Enter number" />
+  <button onclick="calculateFactorial()">Calculate</button>
+  <div id="result"></div>
+  <div id="cacheLog"></div>
+
+  <script>
+    // Memoized factorial function
+    function memoizedFactorial() {
+      const cache = {};
+      
+      function factorial(n) {
+        const logDiv = document.getElementById('cacheLog');
+        if (n <= 1) return 1;
+        if (n in cache) {
+          logDiv.textContent += `Cache hit for n=${n}: ${cache[n]}\n`;
+          return cache[n];
+        }
+        cache[n] = n * factorial(n - 1);
+        logDiv.textContent += `Computed and cached n=${n}: ${cache[n]}\n`;
+        return cache[n];
+      }
+      
+      return factorial;
+    }
+
+    const factorial = memoizedFactorial();
+
+    function calculateFactorial() {
+      const input = document.getElementById('inputNumber').value;
+      const resultDiv = document.getElementById('result');
+      const logDiv = document.getElementById('cacheLog');
+      
+      // Clear previous logs for new calculation
+      logDiv.textContent = '';
+
+      // Validate input
+      const n = parseInt(input);
+      if (isNaN(n) || n < 0) {
+        resultDiv.textContent = 'Please enter a non-negative integer.';
+        return;
+      }
+
+      // Calculate factorial
+      try {
+        const result = factorial(n);
+        resultDiv.textContent = `Factorial of ${n} is ${result}`;
+      } catch (e) {
+        // Use error object 'e' to provide specific error messages
+        if (e.name === 'RangeError' && e.message.includes('stack')) {
+          resultDiv.textContent = `Error: Input ${n} is too large (stack overflow). Try a smaller number.`;
+        } else {
+          resultDiv.textContent = `Error: ${e.message || 'An unexpected error occurred.'}`;
+        }
+      }
+    }
+  </script>
+</body>
+</html>

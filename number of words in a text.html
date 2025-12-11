@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <style>
+            /* Optional: Add some basic styling */
+            input, h1 {
+                margin: 10px;
+            }
+        </style>
+    </head>
+    <body>
+        <p>Enter text here:</p>
+        <input type="text" id="myInput">
+        <h1 id="myOutput"></h1>
+
+        <script>
+            // Get references to elements
+            const input = document.getElementById("myInput");
+            const output = document.getElementById("myOutput");
+
+            // Initialize output
+            output.innerHTML = "Number of words: 0";
+
+            // Add event listener
+            input.addEventListener("input", myFunction);
+
+            function myFunction() {
+                const text = input.value.trim();
+                // Handle empty input
+                if (text === "") {
+                    output.innerHTML = "Number of words: 0";
+                    return;
+                }
+                // Split by whitespace and filter out empty strings
+                const words = text.split(/\s+/).filter(word => word.length > 0);
+                output.innerHTML = "Number of words: " + words.length;
+            }
+        </script>
+    </body>
+</html>

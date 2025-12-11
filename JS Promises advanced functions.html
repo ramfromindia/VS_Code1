@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Promise Methods Demo</title>
+    <style>
+    body {
+        margin: 0;
+        padding: 0;
+        font-family: 'Segoe UI', Arial, sans-serif;
+        background: linear-gradient(135deg, #e0eafc 0%, #cfdef3 100%);
+        min-height: 100vh;
+    }
+
+    h1 {
+        text-align: center;
+        margin-top: 32px;
+        color: #2d3a4b;
+        letter-spacing: 2px;
+        text-shadow: 0 2px 8px rgba(44, 62, 80, 0.08);
+        transition: color 0.3s;
+    }
+
+    .section {
+        background: linear-gradient(120deg, #f8fafc 60%, #e9f1fb 100%);
+        margin: 32px auto;
+        padding: 28px 32px 18px 32px;
+        border-radius: 18px;
+        box-shadow: 0 6px 24px rgba(44, 62, 80, 0.10), 0 1.5px 6px rgba(44, 62, 80, 0.06);
+        max-width: 540px;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        transform: scale(0.98);
+        transition: box-shadow 0.3s, transform 0.3s;
+        animation: fadeInUp 0.7s cubic-bezier(.39,.575,.565,1) both;
+    }
+
+    .section:hover {
+        box-shadow: 0 12px 32px rgba(44, 62, 80, 0.16), 0 2px 8px rgba(44, 62, 80, 0.10);
+        transform: scale(1.01) translateY(-2px);
+    }
+
+    h2 {
+        margin-top: 0;
+        color: #3b4a5a;
+        font-size: 1.25rem;
+        letter-spacing: 1px;
+        margin-bottom: 12px;
+        transition: color 0.3s;
+    }
+
+    .result, .error {
+        margin: 8px 0 0 0;
+        filter: none;
+        padding: 10px 18px;
+        border-radius: 8px;
+        font-size: 1.08rem;
+        min-height: 24px;
+        box-shadow: 0 1px 4px rgba(44, 62, 80, 0.06);
+        opacity: 0;
+        animation: fadeIn 0.7s 0.1s forwards;
+        transition: background 0.3s, color 0.3s, box-shadow 0.3s;
+        word-break: break-word;
+    }
+
+    .result {
+        background: linear-gradient(90deg, #e0ffe8 60%, #f0fff7 100%);
+        color: #256029;
+        border: 1px solid #b6e2c6;
+    }
+
+    .error {
+        background: linear-gradient(90deg, #ffe0e0 60%, #fff0f0 100%);
+        color: #a12a2a;
+        border: 1px solid #e2b6b6;
+    }
+
+    @keyframes fadeInUp {
+        0% {
+            opacity: 0;
+            transform: translateY(30px) scale(0.97);
+        }
+        100% {
+            opacity: 1;
+            transform: translateY(0) scale(0.98);
+        }
+    }
+
+    @keyframes fadeIn {
+        to {
+            opacity: 1;
+        }
+    }
+
+    @media (max-width: 700px) {
+        .section {
+            max-width: 96vw;
+            padding: 18px 8vw 12px 8vw;
+        }
+        h1 {
+            font-size: 1.5rem;
+        }
+        h2 {
+            font-size: 1.05rem;
+        }
+    }
+    </style>
+</head>
+<body>
+    <h1>Advanced Promise Methods in JavaScript</h1>
+    <div id="allDemo" class="section">
+        <h2>Promise.all() Demo</h2>
+        <div id="allSuccess"></div>
+        <div id="allError" class="error"></div>
+    </div>
+    <div id="allRejectDemo" class="section">
+        <h2>Promise.all() with Rejection</h2>
+        <div id="allRejectSuccess"></div>
+        <div id="allRejectError" class="error"></div>
+    </div>
+    <div id="allSettledDemo" class="section">
+        <h2>Promise.allSettled() Demo</h2>
+        <div id="allSettledResult"></div>
+    </div>
+    <div id="raceDemo" class="section">
+        <h2>Promise.race() Demo</h2>
+        <div id="raceSuccess"></div>
+        <div id="raceError" class="error"></div>
+    </div>
+    <div id="raceRejectDemo" class="section">
+        <h2>Promise.race() with Rejection</h2>
+        <div id="raceRejectSuccess"></div>
+        <div id="raceRejectError" class="error"></div>
+    </div>
+    <div id="anyDemo" class="section">
+        <h2>Promise.any() Demo</h2>
+        <div id="anySuccess"></div>
+        <div id="anyError" class="error"></div>
+    </div>
+    <div id="anyRejectDemo" class="section">
+        <h2>Promise.any() All Reject</h2>
+        <div id="anyRejectSuccess"></div>
+        <div id="anyRejectError" class="error"></div>
+    </div>
+    <div id="tryDemo" class="section">
+        <h2>Promise.try() Demo</h2>
+        <div id="trySyncSuccess"></div>
+        <div id="trySyncError" class="error"></div>
+        <div id="tryAsyncSuccess"></div>
+        <div id="tryAsyncError" class="error"></div>
+    </div>
+
+    <script>
+        // Helper function to update DOM
+        function updateDOM(elementId, content, isError = false) {
+            const element = document.getElementById(elementId);
+            element.textContent = content;
+            if (isError) element.classList.add('error');
+            else element.classList.add('result');
+        }
+
+        // Helper function to create a promise that resolves after a delay
+        function delayedPromise(value, delay, shouldReject = false) {
+            return new Promise((resolve, reject) => {
+                setTimeout(() => {
+                    if (shouldReject) {
+                        reject(new Error(`Rejected: ${value}`));
+                    } else {
+                        resolve(value);
+                    }
+                }, delay);
+            });
+        }
+
+        // Demo for Promise.all()
+        const allPromises = [
+            delayedPromise('A', 100),
+            delayedPromise('B', 200),
+            delayedPromise('C', 300)
+        ];
+        Promise.all(allPromises)
+            .then(results => updateDOM('allSuccess', `All resolved: ${JSON.stringify(results)}`))
+            .catch(error => updateDOM('allError', `All error: ${error.message}`, true));
+
+        // Demo for Promise.all() with rejection
+        const allRejectPromises = [
+            delayedPromise('A', 100),
+            delayedPromise('Fail', 200, true),
+            delayedPromise('C', 300)
+        ];
+        Promise.all(allRejectPromises)
+            .then(results => updateDOM('allRejectSuccess', `All resolved: ${JSON.stringify(results)}`))
+            .catch(error => updateDOM('allRejectError', `All error: ${error.message}`, true));
+
+        // Demo for Promise.allSettled()
+        const settledPromises = [
+            delayedPromise('A', 100),
+            delayedPromise('Fail', 200, true),
+            delayedPromise('C', 300)
+        ];
+        Promise.allSettled(settledPromises)
+            .then(results => updateDOM('allSettledResult', `All settled: ${JSON.stringify(results, null, 2)}`));
+
+        // Demo for Promise.race()
+        const racePromises = [
+            delayedPromise('Fast', 100),
+            delayedPromise('Slow', 300)
+        ];
+        Promise.race(racePromises)
+            .then(result => updateDOM('raceSuccess', `Race winner: ${result}`))
+            .catch(error => updateDOM('raceError', `Race error: ${error.message}`, true));
+
+        // Demo for Promise.race() with rejection
+        const raceRejectPromises = [
+            delayedPromise('Fail Fast', 100, true),
+            delayedPromise('Slow', 300)
+        ];
+        Promise.race(raceRejectPromises)
+            .then(result => updateDOM('raceRejectSuccess', `Race winner: ${result}`))
+            .catch(error => updateDOM('raceRejectError', `Race error: ${error.message}`, true));
+
+        // Demo for Promise.any()
+        const anyPromises = [
+            delayedPromise('Fail1', 100, true),
+            delayedPromise('Success', 200),
+            delayedPromise('Fail2', 300, true)
+        ];
+        Promise.any(anyPromises)
+            .then(result => updateDOM('anySuccess', `Any success: ${result}`))
+            .catch(error => updateDOM('anyError', `Any error: ${error.message}`, true));
+
+        // Demo for Promise.any() all reject
+        const anyAllReject = [
+            delayedPromise('Fail1', 100, true),
+            delayedPromise('Fail2', 200, true)
+        ];
+        Promise.any(anyAllReject)
+            .then(result => updateDOM('anyRejectSuccess', `Any success: ${result}`))
+            .catch(error => updateDOM('anyRejectError', `Any error: ${error.message}`, true));
+
+        // Demo for Promise.try()
+        // Synchronous success
+        Promise.try(() => 'Sync Success')
+            .then(result => updateDOM('trySyncSuccess', `Try sync success: ${result}`))
+            .catch(error => updateDOM('trySyncError', `Try error: ${error.message}`, true));
+
+        // Synchronous error
+        Promise.try(() => { throw new Error('Sync Error'); })
+            .then(result => updateDOM('trySyncSuccess', `Try sync success: ${result}`))
+            .catch(error => updateDOM('trySyncError', `Try error: ${error.message}`, true));
+
+        // Asynchronous success
+        Promise.try(() => delayedPromise('Async Success', 100))
+            .then(result => updateDOM('tryAsyncSuccess', `Try async success: ${result}`))
+            .catch(error => updateDOM('tryAsyncError', `Try error: ${error.message}`, true));
+
+        // Asynchronous error
+        Promise.try(() => delayedPromise('Async Fail', 100, true))
+            .then(result => updateDOM('tryAsyncSuccess', `Try async success: ${result}`))
+            .catch(error => updateDOM('tryAsyncError', `Try error: ${error.message}`, true));
+    </script>
+</body>
+</html>

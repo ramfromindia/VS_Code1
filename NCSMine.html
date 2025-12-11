@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nested Comment Section</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      background-color: #f4f7fa;
+      margin: 0;
+      padding: 20px;
+      display: flex;
+      justify-content: center;
+    }
+    #comments-container {
+      max-width: 600px;
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+    ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    li {
+      padding: 10px;
+      border-bottom: 1px solid #eee;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+    li:hover {
+      background-color: #f9f9f9;
+    }
+    ul ul {
+      margin-left: 20px;
+      border-left: 2px solid #007bff;
+    }
+    .hidden {
+      display: none;
+    }
+    li::before {
+      content: '💬';
+      margin-right: 8px;
+    }
+  </style>
+</head>
+<body>
+  <div id="comments-container"></div>
+  <p id = "output1"></p>
+  <p id = "output2"></p>
+  <p id = "output3"></p>
+  <script src = "NCSMineScript.js"></script>
+</body>
+</html>

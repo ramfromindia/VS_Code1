@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Todo App</title>
+	<link rel = "stylesheet" href = "To_Do_AppStyles.css">
+</head>
+<body>
+	<header>
+		<h1>Todo App</h1>
+		<p>Manage your tasks efficiently. Add, edit, delete, and prioritize. Data is saved in your browser.</p>
+	</header>
+	<main>
+		<!-- Task Input Form -->
+		<form id="todo-form" autocomplete="off">
+			<input type="text" id="todo-input" placeholder="Add a new task..." required maxlength="100">
+			<select id="priority-input">
+				<option value="low">Low</option>
+				<option value="medium" selected>Medium</option>
+				<option value="high">High</option>
+			</select>
+			<button type="submit">Add</button>
+		</form>
+		<!-- Task List Section -->
+		<section>
+			<ul id="todo-list"></ul>
+		</section>
+			<!-- Modal Dialog for alerts, confirm, and edit -->
+			<div id="modal-overlay" class="modal-overlay" style="display:none;">
+				<div class="modal-dialog" id="modal-dialog">
+					<!-- Content will be injected by JS -->
+				</div>
+			</div>
+		</main>
+		<script src = "To_Do_AppScripts.js"></script>
+	</body>
+	</html>

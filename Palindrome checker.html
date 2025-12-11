@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <style>
+
+        </style>
+    </head>
+    <body>
+        <h1>Enter text for palindrome checking</h1>
+        <input type = "text" id = "myInput">
+        <button id = "myBtn">Check</button>
+        <h1 id = "myOutput"></h1>
+        <script>
+            const button = document.getElementById("myBtn");
+            const output = document.getElementById("myOutput");
+            
+            const myFunction = () =>{
+                const input = document.getElementById("myInput").value;
+                let left = 0;
+                let right = input.length - 1;
+                while(left<right){
+                    if(input[left]!==input[right]){
+                        output.innerHTML = input + " isn't a palindrome.";
+                        return;
+                    }
+                    left++;
+                    right--;
+                }
+                output.innerHTML = input + " is a palindrome.";
+            }
+            button.addEventListener("click", myFunction);
+        </script>
+    </body>
+</html>

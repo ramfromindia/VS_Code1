@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Debounce vs Throttle Benchmark</title>
+  <style>
+    body { font-family: sans-serif; padding: 2rem; }
+    .result { margin-top: 1rem; font-size: 1.2rem; }
+    span { font-weight: bold; color: #2c3e50; }
+  </style>
+</head>
+<body>
+  <h1>Debounce vs Throttle: Mouse Move Benchmark</h1>
+  <p>Move your mouse around the page for a few seconds to see the difference.</p>
+
+  <div class="result">
+    <p>Raw Event Count: <span id="raw-count">0</span></p>
+    <p>Throttle Count (200ms): <span id="throttle-count">0</span></p>
+    <p>Debounce Count (200ms): <span id="debounce-count">0</span></p>
+  </div>
+
+  <script>
+    let rawCount = 0;
+    let throttleCount = 0;
+    let debounceCount = 0;
+
+    const rawEl = document.getElementById("raw-count");
+    const throttleEl = document.getElementById("throttle-count");
+    const debounceEl = document.getElementById("debounce-count");
+
+    function debounce(fn, delay) {
+      let timer;
+      return function () {
+        clearTimeout(timer);
+        timer = setTimeout(fn, delay);
+      };
+    }
+
+    function throttle(fn, limit) {
+      let lastCall = 0;
+      return function () {
+        const now = Date.now();
+        if (now - lastCall >= limit) {
+          lastCall = now;
+          fn();
+        }
+      };
+    }
+
+    const handleThrottle = throttle(() => {
+      throttleCount++;
+      throttleEl.textContent = throttleCount;
+    }, 200);
+
+    const handleDebounce = debounce(() => {
+      debounceCount++;
+      debounceEl.textContent = debounceCount;
+    }, 200);
+
+    window.addEventListener("mousemove", () => {
+      rawCount++;
+      rawEl.textContent = rawCount;
+      handleThrottle();
+      handleDebounce();
+    });
+  </script>
+</body>
+</html>

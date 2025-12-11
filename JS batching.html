@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Batching Example</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; }
+    #output { margin-top: 20px; border: 1px solid #ccc; padding: 10px; }
+    button { padding: 10px; margin-right: 10px; }
+  </style>
+</head>
+<body>
+  <h1>Batching DOM Updates</h1>
+  <button id="addItem">Add Item</button>
+  <div id="output"></div>
+
+  <script>
+    // Batching utility to collect and apply DOM updates
+    class BatchUpdater {
+      constructor(containerId, batchInterval = 100) {
+        this.container = document.getElementById(containerId);
+        this.batchInterval = batchInterval; // Time to wait before applying batch (ms)
+        this.items = []; // Store items to batch
+        this.timeout = null; // Timeout for batch processing
+      }
+
+      // Add item to batch
+      addItem(text) {
+        this.items.push(text);
+        this.scheduleUpdate();
+      }
+
+      // Schedule batched update
+      scheduleUpdate() {
+        // If no timeout is set, create one
+        if (!this.timeout) {
+          this.timeout = setTimeout(() => {
+            this.applyBatch();
+          }, this.batchInterval);
+        }
+      }
+
+      // Apply all batched updates at once
+      applyBatch() {
+        const fragment = document.createDocumentFragment();
+        this.items.forEach(text => {
+          const div = document.createElement('div');
+          div.textContent = text;
+          fragment.appendChild(div);
+        });
+        this.container.appendChild(fragment); // Single DOM update
+        this.items = []; // Clear batch
+        this.timeout = null; // Reset timeout
+      }
+    }
+
+    // Initialize batch updater
+    const batchUpdater = new BatchUpdater('output', 100);
+
+    // Event listener for button clicks
+    document.getElementById('addItem').addEventListener('click', () => {
+      const timestamp = new Date().toLocaleTimeString();
+      batchUpdater.addItem(`Item added at ${timestamp}`);
+    });
+  </script>
+</body>
+</html>

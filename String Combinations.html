@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #c17700;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+
+        h1 {
+            color: #fff;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        h2 {
+            color: #fff;
+            font-size: 1.5em;
+            background-color: #00f;
+            padding: 10px 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            max-width: 80%;
+            text-align: center;
+            word-wrap: break-word;
+        }
+        </style>
+    </head>
+    <body>
+        <h1>Possible String Combinations</h1>
+        <h2 id = "output"></h2>
+        <script>
+            const possibleCombinations = (str) => {
+                let combinations = [];
+                for(let i=0 ; i<str.length ; i++){
+                    for(let j=i+1; j<str.length + 1 ; j++){
+                        combinations.push(str.slice(i,j))
+                    }
+                }
+                return combinations;
+            }
+            const result = possibleCombinations("ram");
+            document.getElementById("output").innerHTML = result.join(", ");
+        </script>
+    </body>
+</html>

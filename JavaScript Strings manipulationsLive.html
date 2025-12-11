@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        :root {
+            --primary-color: #6366f1;
+            --shadow-color: rgba(99, 102, 241, 0.07);
+            --border-color: #a5b4fc;
+            --loading-color: #e0e7ff;
+        }
+
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(120deg, #f8fafc 0%, #e0e7ff 100%);
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+        }
+
+        p {
+            margin-top: 40px;
+            font-size: 1.3rem;
+            color: #374151;
+        }
+
+        textarea {
+            padding: 12px 18px;
+            font-size: 1.1rem;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            margin: 18px 0 20px 0;
+            width: 500px;
+            height: 150px;
+            box-shadow: 0 2px 8px var(--shadow-color);
+            outline: none;
+            transition: border 0.2s;
+            resize: vertical;
+        }
+
+        textarea:focus {
+            border: 1.5px solid var(--primary-color);
+            background: #f1f5f9;
+        }
+
+        .output-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 500px;
+        }
+
+        h1 {
+            font-size: 1.1rem;
+            font-weight: 500;
+            color: #3730a3;
+            background: #eef2ff;
+            padding: 10px 18px;
+            border-radius: 5px;
+            margin: 10px 0;
+            width: 100%;
+            box-shadow: 0 1px 4px var(--shadow-color);
+            letter-spacing: 0.5px;
+        }
+
+        .progress {
+            display: none;
+            margin: 10px 0;
+            font-size: 1rem;
+            color: #4b5563;
+        }
+
+        .progress.active {
+            display: block;
+        }
+
+        .error {
+            color: #dc2626;
+            font-size: 1rem;
+            margin: 10px 0;
+            display: none;
+        }
+
+        .error.active {
+            display: block;
+        }
+
+        @media (max-width: 600px) {
+            textarea, .output-container {
+                width: 90%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <p>Enter text for live calculations</p>
+    <textarea id="myInput" placeholder="Type or paste your text here..."></textarea>
+    <div class="progress" id="progress">Processing...</div>
+    <div class="error" id="error"></div>
+    <div class="output-container">
+        <h1 id="upperCase">UpperCase: </h1>
+        <h1 id="lowerCase">LowerCase: </h1>
+        <h1 id="titleCase">Title Case: </h1>
+        <h1 id="reverseAll">All Reversed: </h1>
+        <h1 id="vowelConsonant">Vowels: 0, Consonants: 0</h1>
+    </div>
+    <script>
+        const input = document.getElementById("myInput");
+        const progress = document.getElementById("progress");
+        const error = document.getElementById("error");
+        const outputs = {
+            upperCase: document.getElementById("upperCase"),
+            lowerCase: document.getElementById("lowerCase"),
+            titleCase: document.getElementById("titleCase"),
+            reverseAll: document.getElementById("reverseAll"),
+            vowelConsonant: document.getElementById("vowelConsonant")
+        };
+
+        // Debounce function to limit input event frequency
+        function debounce(func, wait) {
+            let timeout;
+            return function (...args) {
+                clearTimeout(timeout);
+                timeout = setTimeout(() => func(...args), wait);
+            };
+        }
+
+        // Show progress
+        function showProgress(show) {
+            progress.classList.toggle("active", show);
+        }
+
+        // Show error
+        function showError(message) {
+            error.textContent = message;
+            error.classList.add("active");
+            setTimeout(() => error.classList.remove("active"), 5000);
+        }
+
+        // Process text in chunks asynchronously
+        function processText(text, chunkSize, callback) {
+            const results = {
+                upperCase: "",
+                lowerCase: "",
+                titleCase: "",
+                reverseAll: "",
+                vowelCount: 0,
+                consonantCount: 0
+            };
+
+            let index = 0;
+
+            function processChunk() {
+                const end = Math.min(index + chunkSize, text.length);
+                const chunk = text.slice(index, end);
+                
+                // Process transformations
+                results.upperCase += upperCaseFunction(chunk);
+                results.lowerCase += lowerCaseFunction(chunk);
+                results.titleCase += titleCaseFunction(chunk);
+                results.reverseAll += reverseAllFunction(chunk);
+                const counts = countVowelsAndConsonantsFunction(chunk);
+                results.vowelCount += counts.vowelCount;
+                results.consonantCount += counts.consonantCount;
+
+                index += chunkSize;
+
+                if (index < text.length) {
+                    // Yield to browser and continue processing
+                    setTimeout(processChunk, 0);
+                } else {
+                    // Processing complete
+                    callback(results);
+                }
+            }
+
+            try {
+                if (text.length === 0) {
+                    callback(results);
+                } else {
+                    processChunk();
+                }
+            } catch (e) {
+                showError("Processing failed: " + e.message);
+                callback(results);
+            }
+        }
+
+        // Uppercase conversion
+        function upperCaseFunction(inputValue) {
+            return inputValue ? inputValue.toUpperCase() : "";
+        }
+
+        // Lowercase conversion
+        function lowerCaseFunction(inputValue) {
+            return inputValue ? inputValue.toLowerCase() : "";
+        }
+
+        // Title case conversion
+        function titleCaseFunction(inputValue) {
+            if (!inputValue) return "";
+            return inputValue
+                .split(/\s+/)
+                .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+                .join(" ");
+        }
+
+        // Reverse function
+        function reverseAllFunction(inputValue) {
+            if (!inputValue) return "";
+            return inputValue
+                .split(/\s+/)
+                .reverse()
+                .map(word => word.split("").reverse().join(""))
+                .join(" ");
+        }
+
+        // Vowel and consonant counter
+        function countVowelsAndConsonantsFunction(inputValue) {
+            let vowelCount = 0;
+            let consonantCount = 0;
+            const vowels = new Set(['a', 'e', 'i', 'o', 'u']);
+            for (let char of inputValue.toLowerCase()) {
+                if (/[a-z]/.test(char)) {
+                    if (vowels.has(char)) {
+                        vowelCount++;
+                    } else {
+                        consonantCount++;
+                    }
+                }
+            }
+            return { vowelCount, consonantCount };
+        }
+
+        // Update DOM with results
+        function updateDOM(results) {
+            outputs.upperCase.textContent = `UpperCase: ${results.upperCase}`;
+            outputs.lowerCase.textContent = `LowerCase: ${results.lowerCase}`;
+            outputs.titleCase.textContent = `Title Case: ${results.titleCase}`;
+            outputs.reverseAll.textContent = `All Reversed: ${results.reverseAll}`;
+            outputs.vowelConsonant.textContent = `Vowels: ${results.vowelCount}, Consonants: ${results.consonantCount}`;
+        }
+
+        // Handle input
+        const handleInput = debounce(() => {
+            const inputValue = input.value;
+            if (inputValue.length > 1000000) {
+                showError("Input too large! Please limit to 1MB.");
+                return;
+            }
+            showProgress(true);
+            processText(inputValue, 10000, (results) => {
+                showProgress(false);
+                updateDOM(results);
+            });
+        }, 300);
+
+        // Listen for input
+        input.addEventListener("input", handleInput);
+    </script>
+</body>
+</html>

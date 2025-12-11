@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>To-Do List App</title>
+  <script src="https://cdn.jsdelivr.net/npm/react@18.2.0/umd/react.development.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/react-dom@18.2.0/umd/react-dom.development.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
+  <style>
+    body {
+      background: linear-gradient(135deg, #3b82f6, #a855f7);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-family: 'Poppins', sans-serif;
+      margin: 0;
+      padding: 16px;
+    }
+    .container {
+      max-width: 550px;
+      width: 100%;
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      padding: 32px;
+      border-radius: 20px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    h1 {
+      font-size: 32px;
+      font-weight: 700;
+      color: #ffffff;
+      text-align: center;
+      margin-bottom: 24px;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+    .input-group {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+    input[type="text"] {
+      flex: 1;
+      padding: 14px;
+      border: none;
+      border-radius: 12px;
+      font-size: 16px;
+      background: rgba(255, 255, 255, 0.8);
+      color: #1f2937;
+      outline: none;
+      transition: all 0.3s ease;
+    }
+    input[type="text"]:focus {
+      background: rgba(255, 255, 255, 1);
+      box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.3);
+    }
+    button.add-btn {
+      padding: 14px 28px;
+      background: #10b981;
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    button.add-btn:hover {
+      background: #059669;
+      transform: scale(1.05);
+    }
+    .controls {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    .toggle-all {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #ffffff;
+      font-size: 14px;
+    }
+    .toggle-all input {
+      width: 20px;
+      height: 20px;
+      accent-color: #10b981;
+      cursor: pointer;
+    }
+    .filters {
+      display: flex;
+      gap: 8px;
+    }
+    .filter-btn {
+      padding: 8px 16px;
+      background: rgba(255, 255, 255, 0.2);
+      color: #ffffff;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    .filter-btn.active {
+      background: #10b981;
+      color: #ffffff;
+    }
+    .filter-btn:hover:not(.active) {
+      background: rgba(255, 255, 255, 0.3);
+    }
+    .task-count {
+      color: #ffffff;
+      font-size: 14px;
+    }
+    ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    li {
+      display: flex;
+      align-items: center;
+      padding: 14px;
+      background: rgba(255, 255, 255, 0.9);
+      border-radius: 12px;
+      margin-bottom: 12px;
+      transition: all 0.3s ease;
+      animation: fadeIn 0.5s ease-in;
+    }
+    li:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    li input[type="checkbox"] {
+      width: 24px;
+      height: 24px;
+      margin-right: 12px;
+      accent-color: #10b981;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    li span {
+      flex: 1;
+      font-size: 16px;
+      color: #1f2937;
+      cursor: pointer;
+    }
+    li span.completed {
+      text-decoration: line-through;
+      color: #6b7280;
+    }
+    li input.edit-input {
+      flex: 1;
+      padding: 8px;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      background: #ffffff;
+      color: #1f2937;
+      outline: none;
+      margin-right: 12px;
+    }
+    li button.delete-btn {
+      background: none;
+      border: none;
+      color: #ef4444;
+      font-size: 18px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    li button.delete-btn:hover {
+      color: #b91c1c;
+      transform: scale(1.1);
+    }
+    .clear-completed {
+      text-align: right;
+      margin-top: 16px;
+    }
+    button.clear-btn {
+      background: none;
+      border: none;
+      color: #ef4444;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    button.clear-btn:hover {
+      color: #b91c1c;
+      text-decoration: underline;
+    }
+    @media (max-width: 480px) {
+      .container {
+        padding: 20px;
+      }
+      h1 {
+        font-size: 24px;
+      }
+      input[type="text"], button.add-btn {
+        padding: 12px;
+        font-size: 14px;
+      }
+      li {
+        padding: 12px;
+      }
+      .controls {
+        flex-direction: column;
+        gap: 12px;
+      }
+      .filters {
+        justify-content: center;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+  <script>
+    const e = React.createElement;
+    function TodoApp() {
+      const [todos, setTodos] = React.useState(() => {
+        const saved = localStorage.getItem('todos');
+        return saved ? JSON.parse(saved) : [];
+      });
+      const [input, setInput] = React.useState('');
+      const [filter, setFilter] = React.useState('all');
+      const [editing, setEditing] = React.useState(null);
+      const [editText, setEditText] = React.useState('');
+
+      React.useEffect(() => {
+        localStorage.setItem('todos', JSON.stringify(todos));
+      }, [todos]);
+
+      const addTodo = () => {
+        if (input.trim()) {
+          setTodos([...todos, { id: Date.now(), text: input, completed: false }]);
+          setInput('');
+        }
+      };
+
+      const deleteTodo = (id) => {
+        setTodos(todos.filter(todo => todo.id !== id));
+        if (editing === id) setEditing(null);
+      };
+
+      const toggleComplete = (id) => {
+        setTodos(
+          todos.map(todo =>
+            todo.id === id ? { ...todo, completed: !todo.completed } : todo
+          )
+        );
+      };
+
+      const startEditing = (id, text) => {
+        setEditing(id);
+        setEditText(text);
+      };
+
+      const saveEdit = (id) => {
+        if (editText.trim()) {
+          setTodos(
+            todos.map(todo =>
+              todo.id === id ? { ...todo, text: editText } : todo
+            )
+          );
+        }
+        setEditing(null);
+      };
+
+      const cancelEdit = () => {
+        setEditing(null);
+      };
+
+      const clearCompleted = () => {
+        setTodos(todos.filter(todo => !todo.completed));
+      };
+
+      const toggleAll = () => {
+        const allCompleted = todos.every(todo => todo.completed);
+        setTodos(
+          todos.map(todo => ({ ...todo, completed: !allCompleted }))
+        );
+      };
+
+      const filteredTodos = todos.filter(todo => {
+        if (filter === 'active') return !todo.completed;
+        if (filter === 'completed') return todo.completed;
+        return true;
+      });
+
+      const activeCount = todos.filter(todo => !todo.completed).length;
+
+      return e('div', { className: 'container' },
+        e('h1', null, 'To-Do List'),
+        e('div', { className: 'input-group' },
+          e('input', {
+            type: 'text',
+            value: input,
+            onChange: (e) => setInput(e.target.value),
+            onKeyPress: (e) => e.key === 'Enter' && addTodo(),
+            placeholder: 'Add a new task...'
+          }),
+          e('button', { className: 'add-btn', onClick: addTodo }, 'Add')
+        ),
+        e('div', { className: 'controls' },
+          e('div', { className: 'toggle-all' },
+            e('input', {
+              type: 'checkbox',
+              checked: todos.length > 0 && todos.every(todo => todo.completed),
+              onChange: toggleAll
+            }),
+            e('span', null, 'Toggle All')
+          ),
+          e('span', { className: 'task-count' }, 
+            `${activeCount} ${activeCount === 1 ? 'task' : 'tasks'} remaining`
+          ),
+          e('div', { className: 'filters' },
+            e('button', { 
+              className: `filter-btn ${filter === 'all' ? 'active' : ''}`, 
+              onClick: () => setFilter('all') 
+            }, 'All'),
+            e('button', { 
+              className: `filter-btn ${filter === 'active' ? 'active' : ''}`, 
+              onClick: () => setFilter('active') 
+            }, 'Active'),
+            e('button', { 
+              className: `filter-btn ${filter === 'completed' ? 'active' : ''}`, 
+              onClick: () => setFilter('completed') 
+            }, 'Completed')
+          )
+        ),
+        e('ul', null,
+          filteredTodos.map(todo =>
+            e('li', { key: todo.id },
+              editing === todo.id
+                ? e('input', {
+                    className: 'edit-input',
+                    type: 'text',
+                    value: editText,
+                    onChange: (e) => setEditText(e.target.value),
+                    onKeyPress: (e) => {
+                      if (e.key === 'Enter') saveEdit(todo.id);
+                      if (e.key === 'Escape') cancelEdit();
+                    },
+                    onBlur: () => saveEdit(todo.id),
+                    autoFocus: true
+                  })
+                : e('div', { className: 'task-content' },
+                    e('input', {
+                      type: 'checkbox',
+                      checked: todo.completed,
+                      onChange: () => toggleComplete(todo.id)
+                    }),
+                    e('span', { 
+                      className: todo.completed ? 'completed' : '',
+                      onDoubleClick: () => startEditing(todo.id, todo.text)
+                    }, todo.text)
+                  ),
+              e('button', { 
+                className: 'delete-btn', 
+                onClick: () => deleteTodo(todo.id) 
+              }, e('i', { className: 'fas fa-trash' }))
+            )
+          )
+        ),
+        todos.some(todo => todo.completed) && 
+        e('div', { className: 'clear-completed' },
+          e('button', { className: 'clear-btn', onClick: clearCompleted }, 
+            'Clear Completed'
+          )
+        )
+      );
+    }
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(e(TodoApp));
+  </script>
+</body>
+</html>

@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <style>
+            body {
+            background: linear-gradient(120deg, #f8fafc 0%, #e0e7ff 100%);
+            font-family: 'Segoe UI', Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            min-height: 100%;
+            }
+            .container {
+            max-width: 500px;
+            margin: 40px auto;
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: 0 4px 24px rgba(60,72,88,0.12);
+            padding: 32px 24px;
+            }
+            h1 {
+            color: #4f46e5;
+            font-size: 1.5rem;
+            margin-bottom: 16px;
+            }
+            p {
+            color: #64748b;
+            font-size: 1.1rem;
+            margin-bottom: 24px;
+            }
+            input[type="text"] {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font-size: 1rem;
+            margin-bottom: 10px;
+            box-sizing: border-box;
+            transition: border 0.2s;
+            }
+            input[type="text"]:focus {
+            border: 1.5px solid #6366f1;
+            outline: none;
+            }
+            button {
+            background: #6366f1;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            padding: 10px 18px;
+            margin: 2px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.1s;
+            box-shadow: 0 2px 8px rgba(99,102,241,0.08);
+            }
+            button:hover {
+            background: #4338ca;
+            transform: translateY(-2px) scale(1.04);
+            }
+            #upperCase, #lowerCase, #titleCase, #reverseCase, #vowelConsonant {
+            font-size: 1.1rem;
+            color: #334155;
+            background: #f1f5f9;
+            border-radius: 8px;
+            padding: 10px 14px;
+            margin: 10px 0;
+            min-height: 28px;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+            }
+        </style>
+    </head>
+    <body>
+        <p>JavaScript string manipulations at display</p>
+        <h1>Enter text:</h1>
+        <input type = "text" id = "myInput"><br><br>
+        <button id = "myBtn1">UpperCase</button>
+        <button id = "myBtn2">LowerCase</button>
+        <button id = "myBtn3">TitleCase</button>
+        <button id = "myBtn4">reverseAll</button>
+        <button id = "myBtn5">vowelConsonant</button>
+        <h1 id = "upperCase"></h1>
+        <h1 id = "lowerCase"></h1>
+        <h1 id = "titleCase"></h1>
+        <h1 id = "reverseCase"></h1>
+        <h1 id = "vowelConsonant"></h1>
+        <script>
+            const btnUpperCase = document.getElementById("myBtn1");
+            const upperCase = document.getElementById("upperCase");
+            const btnLowerCase = document.getElementById("myBtn2");
+            const lowerCase = document.getElementById("lowerCase");
+            const btnTitleCase = document.getElementById("myBtn3");
+            const titleCase = document.getElementById("titleCase");
+            const btnReverseCase = document.getElementById("myBtn4");
+            const reverseCase = document.getElementById("reverseCase");
+            const btnVowelConsonant = document.getElementById("myBtn5");
+            const vowelConsonant = document.getElementById("vowelConsonant");
+
+            btnUpperCase.addEventListener("click",upperCaseFunction)
+            function upperCaseFunction(){
+                const input = document.getElementById("myInput").value;
+                const output = input.trim().replace(/[^a-zA-Z0-9 ]/g,"").toUpperCase();
+                upperCase.innerHTML = output;
+            }
+
+            btnLowerCase.addEventListener("click",lowerCaseFunction);
+            function lowerCaseFunction(){
+                const input = document.getElementById("myInput").value;
+                const output = input.trim().replace(/[^a-zA-Z0-9 ]/g, '').toLowerCase();
+                lowerCase.innerHTML = output;
+            }
+
+            btnTitleCase.addEventListener("click",titleCaseFunction);
+            function titleCaseFunction(){
+                const input = document.getElementById("myInput").value;
+                const output = input.trim().replace(/[^a-zA-Z0-9 ]/g,"").split(" ").map((word)=>{return word.at(0).toUpperCase() + word.slice(1).toLowerCase()}).join(" ");
+                titleCase.innerHTML = output;
+            }
+
+            btnReverseCase.addEventListener("click",reverseCaseFunction);
+            function reverseCaseFunction(){
+                const input = document.getElementById("myInput").value;
+                const output = input.trim().replace(/[^a-zA-Z0-9 ]/g,"").split(" ").reverse().map((word)=>{return word.split("").reverse().join("")}).join(" ");
+                reverseCase.innerHTML = output;
+            }
+
+            btnVowelConsonant.addEventListener("click", vowelConsonantFunction);
+            function vowelConsonantFunction() {
+               const input = document.getElementById("myInput").value;
+               const cleaned = input.trim().replace(/[^a-zA-Z]/g, '').toLowerCase();
+               const vowels = (cleaned.match(/[aeiou]/g) || []).length;
+               const consonants = (cleaned.match(/[^aeiou]/g) || []).length;
+               vowelConsonant.innerHTML = `Vowels: ${vowels}, Consonants: ${consonants}`;
+}
+        </script>
+    </body>
+</html>

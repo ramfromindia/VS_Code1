@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <style></style>
+    </head>
+    <body>
+        <button onclick = "processWords(input)">Click</button>
+        <h2 id = "output1"></h2>
+        <h2 id = "output2"></h2>
+        <h2 id = "output3"></h2>
+        <h2 id = "output4"></h2>
+        <h2 id = "output5"></h2>
+
+        <script>
+            let input = " .I am JavaScript developer!!, ";
+            const output1 = document.getElementById("output1");
+            const output2 = document.getElementById("output2");
+            const output3 = document.getElementById("output3");
+            const output4 = document.getElementById("output4");
+            const output5 = document.getElementById("output5");
+            output1.textContent = `Initial input: ${input}(${input.length} chars)`;
+            function processWords(input) {
+            let trimmedInput = input.trim();
+            output2.textContent = `No leading/trailing spaces: ${trimmedInput} (${trimmedInput.length} chars)`;
+
+            let replacedInput = trimmedInput.replace(/[.,]/g, "");
+            output3.textContent = `No periods/commas: ${replacedInput} (${replacedInput.length} chars)`;
+
+            let reversedInput = replacedInput.split("").reverse().join("");
+            output4.textContent = `Reversed Input: ${reversedInput} (${reversedInput.length} chars)`;
+
+            let reverseSortedWords = input.trim()
+            .replace(/[.,!]/g, "")
+            .split(" ")
+            .filter(word => word.match(/[a-zA-Z]/))
+            .map((word) => word.split("").sort((a, b) => b.toLowerCase(). localeCompare(a.toLowerCase())).join(""))
+            .join(" ");
+            output5.textContent = `Reverse sorted input words: ${reverseSortedWords} (${reverseSortedWords.length} chars)`;
+}
+        </script>
+    </body>
+</html>
